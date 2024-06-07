@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 
 const fetchTodos = async () => {
-  const res = await fetch("http://localhost:3000/todos");
-  if (!res.ok) {
-    throw new Error(`${res.status} ${res.statusText}`);
-  }
-  return res.json();
+  const res = await axios.get("http://localhost:3000/todos");
+  return res.data;
 };
 
 const Todo = () => {
@@ -17,7 +15,10 @@ const Todo = () => {
   } = useQuery({
     queryKey: ["todos"],
     queryFn: fetchTodos,
-    retry: 5,
+    // refetchOnWindowFocus: false,
+    // refetchInterval: 1000,
+    // staleTime: 3000,
+    gcTime: 0,
   });
 
   if (isPending) {
@@ -25,7 +26,8 @@ const Todo = () => {
   }
 
   if (isError) {
-    return <p>Error: {error.message}</p>;
+    console.log(error);
+    return <p>Error: {error.response.data.message}</p>;
   }
 
   return (
